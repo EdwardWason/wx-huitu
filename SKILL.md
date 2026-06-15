@@ -23,13 +23,11 @@ description: "公众号数据绘图专家。输入文章或数据描述，输出
 - **代码编辑** → 用代码工具
 - **交互式图表** → 用 plotly/echarts 独立部署
 
+---
+
 ## Workflow (4步)
 
-Read [`references/workflow.md`](references/workflow.md) for full spec.
-
-```
 输入 → Step 1: 数据剖析(静默) → Step 2: 图型推荐(确认) → Step 3: 风格+生成HTML → Step 4: 截图交付+云盘同步
-```
 
 ### Step 1: Data Profiling (静默)
 
@@ -39,56 +37,106 @@ Read [`references/workflow.md`](references/workflow.md) for full spec.
 **轴2: 论证意图** — 比较/趋势/占比/关系/流程/层级/重叠/累积
 **轴3: 数据形态** — 数据点数量/类别数/是否有异常值/是否有分组
 
-输出内部剖析报告，不暴露给用户。
-
 ### Step 2: Chart Recommendation (确认点)
 
-基于三轴分析推荐图型，**必须给出推荐+理由+1-2备选**。
+基于三轴分析推荐图型，必须给出推荐+理由+1-2备选。
 
-触发拦截规则时先说明问题再给替代方案：
-
-| # | 拦截 | 替代 |
-|---|------|------|
-| I1 | 2个数据点画折线图 | bar-chart |
-| I2 | 7+类别画donut | horizontal-bar-chart |
-| I3 | 单一数值做数据图 | data-billboard |
-| I4 | 一图承载>2个论点 | 拆图 |
-| I5 | 类别变量用折线连接 | bar-chart |
-| I6 | Y轴不从0起且无断裂标记 | 加断裂标记或从0起 |
-| I7 | rainbow/jet色图 | 主题色板+冗余编码 |
-| I8 | 图例压数据 | 调整图例位置 |
-
-用户确认后进入 Step 3。
+8条拦截规则：I1(2点折线→bar) / I2(7+类别donut→h-bar) / I3(单值做图→billboard) / I4(一图多论点→拆图) / I5(类别折线→bar) / I6(Y轴不从0起) / I7(rainbow色图→安全色板) / I8(图例压数据)
 
 ### Step 3: Style + Generate HTML
 
-1问定风格：主题色偏好（默认克制风/品牌DNA/指定色系）
+1问定风格：A.克制风 / B.品牌DNA / C.高端财经(C1麦肯锡/C2经济学人/C3财新) / D.指定色系
 
-生成独立HTML文件（内联CSS+SVG+`<img>`标签+固定尺寸+overflow:hidden）。
-
-输出目录：`[article-name]-charts/` 含所有HTML + `screenshot.js`
+生成独立HTML文件（内联CSS+SVG+固定尺寸+overflow:hidden）。
 
 ### Step 4: Screenshot & Deliver
 
-Puppeteer-core → PNG → 桌面文件夹 → 飞书云盘同步。Read [`references/workflow.md`](references/workflow.md) Step 4.
+Puppeteer-core → PNG → 桌面文件夹 → 飞书云盘同步。
 
-## Rules
+---
 
-### Decision Framework
-1. **三轴决策先行** — 变量类型 × 论证意图 × 数据形态 → 图型。同样数据不同论点=不同图。Read [`references/chart-system.md`](references/chart-system.md).
-2. **主动拦截** — 发现不当图型选择时先说明问题再给替代方案，不默默照做。8条拦截规则见 Step 2.
+## 18种图型 + 三画幅
 
-### Quality
-3. **色盲安全** — 默认 Okabe-Ito 8色 + 冗余编码（不同形状/线型）。单图不超4色。Read [`references/chart-system.md`](references/chart-system.md).
-4. **密度门控** — 每张图表必须包含：标题+数据主体+轴标签/图例+数据来源。缺一不生成。
+| # | Type | When | 画幅 |
+|---|------|------|------|
+| 1 | bar-chart | 2-6类别比较 | 标准 |
+| 2 | horizontal-bar-chart | 7+类别或长标签 | 标准 |
+| 3 | line-chart | 8+时间点趋势 | 宽幅 |
+| 4 | donut-chart | 2-5段占比 | 方版 |
+| 5 | quadrant-chart | 2轴+阈值线 | 方版 |
+| 6 | flow-chart | 3-8步顺序流程 | 宽幅 |
+| 7 | swimlane-chart | 2-4角色并行流程 | 宽幅 |
+| 8 | state-machine | 状态转换+条件 | 方版 |
+| 9 | tree-chart | 层级结构 | 标准 |
+| 10 | layered-diagram | 分层架构 | 标准 |
+| 11 | venn-diagram | 2-3集合重叠 | 方版 |
+| 12 | waterfall-chart | 累积正负贡献 | 标准 |
+| 13 | treemap | 多类别层级占比 | 标准 |
+| 14 | scatter-plot | 2连续变量关系 | 方版 |
+| 15 | grouped-bar | 分组类别对比 | 宽幅 |
+| 16 | stacked-bar | 分组占比对比 | 标准 |
+| 17 | area-chart | 趋势+总量 | 宽幅 |
+| 18 | comparison-table | 多维度行列对比 | 标准 |
+| 补充 | data-billboard | 单一关键数值 | 标准 |
 
-### Delivery
-5. **截图交付** — Puppeteer-core → PNG → 桌面文件夹 → 飞书云盘同步。照片背景用`<img>`标签。Read [`references/workflow.md`](references/workflow.md).
+三画幅：宽幅640x400 / 标准640x480 / 方版640x640
 
-## 必读参考文件
+---
+
+## CSS变量体系
+
+通用变量：
+--ink:#0a0a0a; --paper:#fafaf8; --accent:#002FA7; --muted:#737373; --rule:#d4d4d2;
+--surface:#ffffff; --surface-2:#f2f2f0; --good:#1aaf6c; --bad:#e0445a; --warn:#f5a524;
+--font-body:'Noto Sans SC',sans-serif; --font-data:'Inter','Noto Sans SC',sans-serif;
+--chart-1:#E69F00; --chart-2:#56B4E9; --chart-3:#009E73; --chart-4:#D55E00;
+
+麦肯锡：--paper:#F7F5F2; --accent:#0F4C81; --chart-1:#0F4C81; --chart-2:#2A7B9B; --chart-3:#3A9D8F; --chart-5:#E2A828
+经济学人：--paper:#FDFBF7; --accent:#E3120B; --chart-1:#E3120B; --chart-2:#0D47A1; --chart-3:#4A7C59
+财新：--paper:#F5F5F3; --accent:#0055AA; --chart-1:#0055AA; --chart-2:#3A7BBF; --chart-3:#7BAFD4; --chart-4:#C0392B
+
+强调色块硬约束：禁止近黑色，必须用--accent品牌色做底色+白色文字
+
+---
+
+## HTML模板骨架
+
+```html
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@200;300;400;500;700&display=swap');
+:root{--ink:#0a0a0a;--paper:#fafaf8;--accent:#002FA7;--muted:#737373;--rule:#d4d4d2;--surface:#ffffff;--surface-2:#f2f2f0;--good:#1aaf6c;--bad:#e0445a;--warn:#f5a524;--font-body:'Noto Sans SC',sans-serif;--font-data:'Inter','Noto Sans SC',sans-serif;--chart-1:#E69F00;--chart-2:#56B4E9;--chart-3:#009E73;--chart-4:#D55E00}
+*{margin:0;padding:0;box-sizing:border-box}
+.num{font-family:var(--font-data);font-feature-settings:'tnum' on;letter-spacing:-0.02em}
+html,body{width:640px;overflow:hidden;font-family:var(--font-body);background:var(--paper);color:var(--ink)}
+</style></head><body><!-- 图表内容 --></body></html>
+```
+
+KPI+Sparkline组件：
+```html
+<div class="kpi-grid"><div class="kpi-card"><div class="kpi-label">月活用户</div><div class="kpi-value num">2.4M</div><div class="kpi-delta up">+12.3%</div><svg class="sparkline" viewBox="0 0 80 24" preserveAspectRatio="none"><polyline fill="none" stroke="var(--chart-1)" stroke-width="1.5" points="0,18 10,16 20,14 30,15 40,12 50,10 60,8 70,6 80,4"/></svg></div></div>
+```
+CSS: .kpi-grid{display:flex;gap:10px} .kpi-card{flex:1;padding:14px;background:var(--surface);border:1px solid var(--rule)} .kpi-value{font-size:28px;font-weight:200} .kpi-delta.up{color:var(--good)} .kpi-delta.down{color:var(--bad)} .sparkline{width:100%;height:24px;margin-top:6px}
+
+---
+
+## Chart Styling Rules
+
+- 标题18-24px/500; 轴标12px/400 --muted; 数据标13px/500 .num; 来源10-11px --muted
+- 数值用.num → --font-data (Inter) + tnum等宽对齐
+- 卡片用--surface; 次级表面用--surface-2; 强调块用--accent+白字
+- 涨--good; 跌--bad; 警告--warn
+- 每张图底部必须标注数据来源
+- Okabe-Ito 8色+冗余编码，单图不超4色
+- 每张图表必须包含：标题+数据主体+轴标签/图例+数据来源
+
+---
+
+## 详细参考文件
 
 | 文件 | 用途 |
 |------|------|
-| [`references/workflow.md`](references/workflow.md) | **4步工作流**：剖析→推荐→生成→交付 |
-| [`references/chart-system.md`](references/chart-system.md) | **图表系统**：14种图型+三轴决策树+拦截规则+色板+HTML骨架 |
-| [`references/design-tokens.md`](references/design-tokens.md) | **设计令牌**：CSS变量体系+双风格主题+字号规范 |
+| references/workflow.md | 完整4步工作流：剖析→推荐→生成→交付 |
+| references/chart-system.md | 完整图表系统：18种图型+三轴决策树+8条拦截规则+色板+7种HTML骨架 |
+| references/design-tokens.md | 完整设计令牌：3套财经配色详解+字号规范+间距规范+画幅弹性规则 |
