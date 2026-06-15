@@ -1,6 +1,6 @@
 # wx-huitu 核心工作流
 
-> 版本: 1.0 | 输出格式: HTML → Puppeteer 截图 → PNG 交付
+> 版本: 2.0 | 输出格式: HTML → Puppeteer 截图 → PNG 交付
 > 触发词: `文章绘图` / `绘图图表` / `画个图表` / `数据图` / `做个图` / `画图`
 
 ## Core Principles
@@ -155,15 +155,24 @@ Step 4: 截图交付 + 云盘同步
 🎨 主题色偏好？
   A. 克制风（单品牌色+暖灰层级）— 默认
   B. 品牌DNA（自动检测文章来源色）
-  C. 指定色系：______
+  C. 高端财经：
+     C1. 麦肯锡（深蓝+青绿+暖灰白，克制严谨）
+     C2. 经济学人（红+深蓝+米白，英式鲜明）
+     C3. 财新（财新蓝+冷灰白，中式精炼）
+  D. 指定色系：______
 ```
 
-### 尺寸体系
+> 高端财经配色详见 [`design-tokens.md`](design-tokens.md) 第2节。核心原则：低饱和度、高灰度占比、单色系为主+1个强调色、大面积留白。
 
-| 格式 | 尺寸 | 适用图型 |
-|------|------|---------|
-| **横版** | 640×auto (400-800px高) | bar-chart, line-chart, flow-chart, h-bar-chart, waterfall-chart, swimlane-chart, layered-diagram, timeline, candlestick-chart, state-machine |
-| **方版** | 640×640 | donut-chart, quadrant-chart, venn-diagram, treemap, scatter-plot, bubble-chart, data-billboard |
+### 尺寸体系（三画幅）
+
+| 画幅 | 基准尺寸 | 弹性区间 | 适用图型 |
+|------|---------|---------|---------|
+| **宽幅** | 640×400 | 360-480px | line-chart, flow-chart, grouped-bar, area-chart |
+| **标准** | 640×480 | 420-600px | bar-chart, h-bar-chart, layered-diagram, waterfall-chart, stacked-bar, comparison-table, data-billboard, tree-chart, treemap, swimlane-chart |
+| **方版** | 640×640 | 560-720px | donut-chart, quadrant-chart, venn-diagram, scatter-plot, bubble-chart, state-machine |
+
+> 画幅详细映射和弹性规则见 [`design-tokens.md`](design-tokens.md) 第5节。
 
 ### HTML 生成规则
 
@@ -192,20 +201,28 @@ Step 4: 截图交付 + 云盘同步
 <head>
 <meta charset="UTF-8">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@200;300;400;500;700&display=swap');
 :root {
   --ink: #0a0a0a;
   --paper: #fafaf8;
   --accent: #002FA7;
   --muted: #737373;
   --rule: #d4d4d2;
+  --surface: #ffffff;
+  --surface-2: #f2f2f0;
+  --good: #1aaf6c;
+  --bad: #e0445a;
+  --warn: #f5a524;
   --font-body: 'Noto Sans SC', sans-serif;
+  --font-data: 'Inter', 'Noto Sans SC', sans-serif;
   --chart-1: #E69F00;
   --chart-2: #56B4E9;
   --chart-3: #009E73;
   --chart-4: #D55E00;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
+.num { font-family: var(--font-data); font-feature-settings: 'tnum' on; letter-spacing: -0.02em; }
 html, body { width: 640px; overflow: hidden; font-family: var(--font-body); background: var(--paper); color: var(--ink); }
 </style>
 </head>
